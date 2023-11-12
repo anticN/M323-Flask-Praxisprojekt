@@ -5,7 +5,7 @@ students = [Student(1, "Lambo", 18, "IM21A", {"IT": 5.5, "Mathe": 4.5, "Deutsch"
             Student(2, "Maroc", 17, "IM21A", {"IT": 3.5, "Mathe": 4, "Deutsch": 3.5}),
             Student(3, "Miro", 19, "IM21B", {"IT": 3.5, "Mathe": 4, "Deutsch": 4.5}),
             Student(4, "Mero", 18, "IM21B", {"IT": 5, "Mathe": 5.5, "Deutsch": 6}),
-            Student(5, "Moro", 17, "IM21B", {"IT": 4.5, "Mathe": 4.5, "Deutsch": 4}),]
+            Student(5, "Moro", 17, "IM21B", {"IT": 4.5, "Mathe": 4.5, "Deutsch": 4})]
 
 
 app = Flask(__name__)
@@ -118,6 +118,38 @@ def display_ages():
     return student_ages
 
 
+def calculate_subject_class_average(subject):
+    """
+    Funktion, die eine Closure zurückgibt,
+    um den Klassenschnitt für ein bestimmtes Fach zu berechnen.
+    """
+    total_students = len(students)
+
+    def subject_class_average():
+        total_grades = sum(student.grades.get(subject, 0) for student in students)
+        return total_grades / total_students if total_students > 0 else 0
+
+    return subject_class_average
+
+
+@app.route('/b2e/<subject>')
+def subject_class_average(subject):
+    """
+    Route, die den Klassenschnitt für ein Fach anzeigt.
+    """
+    avg_closure = calculate_subject_class_average(subject)
+    avg = avg_closure()
+    return f"Der Klassenschnitt für {subject} ist {avg}"
+
+
+@app.route('/b3g')
+def student_names_caps():
+    """
+    Route, die die Namen aller Schüler in Grossbuchstaben anzeigt.
+    """
+    convert_to_upper = lambda student: student.name.upper()
+    caps_names = map(convert_to_upper, students)
+    return str(list(caps_names))
 
 if __name__ == '__main__':
     students[0].add_excused_absence("Krank")
