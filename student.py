@@ -13,6 +13,12 @@ class Student:
         self.excused_absences = []
         self.unexcused_absences = []
 
+    def __str__(self):
+        return f"Student: student_id: {self.student_id}, name: {self.name}, age: {self.age}, student_class: {self.student_class}, grades: {self.grades}"
+
+    def __repr__(self):
+        return f"Student: student_id: {self.student_id}, name: {self.name}, age: {self.age}, student_class: {self.student_class}, grades: {self.grades}"
+
     def add_excused_absence(self, reason):
         self.excused_absences.append(Absence(datetime.datetime.now(), reason, self.student_id, True))
 
