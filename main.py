@@ -151,6 +151,18 @@ def student_names_caps():
     caps_names = map(convert_to_upper, students)
     return str(list(caps_names))
 
+
+@app.route('/b3f/<int:student_id>')
+def amount_absences(student_id):
+    """
+    Route, die die Anzahl Absenzen eines Schülers anzeigt.
+    """
+    calculate_total_absences = lambda excused, unexcused: excused + unexcused
+    excused_amount = len(students[student_id-1].excused_absences)
+    unexcused_amount = len(students[student_id-1].unexcused_absences)
+    return str(calculate_total_absences(excused_amount, unexcused_amount))
+
+
 if __name__ == '__main__':
     students[0].add_excused_absence("Krank")
     students[0].add_unexcused_absence("Zu spät")
