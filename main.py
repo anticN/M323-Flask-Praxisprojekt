@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from student import Student, Absence
+from functools import reduce
 
 students = [Student(1, "Lambo", 18, "IM21A", {"IT": 5.5, "Mathe": 4.5, "Deutsch": 5}),
             Student(2, "Maroc", 17, "IM21A", {"IT": 3.5, "Mathe": 4, "Deutsch": 3.5}),
@@ -48,6 +49,7 @@ def avg_grades(student_id):
     return f"Der Durchschnitt der Noten von {students[student_id-1].name} ist {avg}"
 
 
+
 def filter_by_grades(students, grade):
     new_list = []
     for student in students:
@@ -86,6 +88,7 @@ def filter_students(filter_func, filter_value):
         return str(filter_func)
     else:
         return "Falsche Funktion"
+
 
 
 # Funktion zur Anzeige von Schülern
@@ -161,6 +164,38 @@ def amount_absences(student_id):
     excused_amount = len(students[student_id-1].excused_absences)
     unexcused_amount = len(students[student_id-1].unexcused_absences)
     return str(calculate_total_absences(excused_amount, unexcused_amount))
+
+
+# Lambda-Ausdruck für die Sortierung nach Durchschnittsnoten
+sort_by_average = lambda student: sum(student.grades.values()) / len(student.grades)
+
+
+@app.route('/b3e')
+def sorted_students():
+    """
+    Route, die die sortierten Schüler nach Durchschnittsnoten anzeigt.
+    """
+    sorted_students_list = sorted(students, key=sort_by_average, reverse=True)
+    return str(sorted_students_list)
+
+
+# Funktion zur Berechnung des Durchschnitts
+calculate_average = lambda student: sum(student.grades.values()) / len(student.grades)
+
+
+@app.route('/b4g')
+def map_filter_reduce():
+    """
+    Route, die alle 3 der gefragten Funktionen einzeln auf Listen ausführt. (map, filter, reduce)
+    :return: Die Ergebnisse der 3 Funktionen
+    """
+    average_grades_list = list(map(calculate_average, students))
+    filtered_students_list = list(filter(lambda student: student.age >= 18, students))
+    total_average_value = reduce(lambda acc, student: acc + sum(student.grades.values()) / len(student.grades), students, 0) / len(students)
+
+    return f"Die Durchschnittsnoten sind: {average_grades_list} <br> Die gefilterten Schüler sind: {filtered_students_list} <br> Der Klassendurchschnitt ist: {total_average_value}"
+
+
 
 
 if __name__ == '__main__':
