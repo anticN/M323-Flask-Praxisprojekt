@@ -19,5 +19,3 @@ class Student:
     def add_unexcused_absence(self, reason):
         self.unexcused_absences.append(Absence(datetime.datetime.now(), reason, self.student_id))
 
-    def get_total_absences(self):
-        return len(self.excused_absences) + len(self.unexcused_absences)
