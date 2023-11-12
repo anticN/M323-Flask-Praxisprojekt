@@ -1,4 +1,4 @@
-import flask
+from flask import Flask, jsonify, request
 from student import Student, Absence
 
 students = [Student(1, "Lambo", 18, "IM21A", {"IT": 5.5, "Mathe": 4.5, "Deutsch": 5}),
@@ -8,7 +8,7 @@ students = [Student(1, "Lambo", 18, "IM21A", {"IT": 5.5, "Mathe": 4.5, "Deutsch"
             Student(5, "Moro", 17, "IM21B", {"IT": 4.5, "Mathe": 4.5, "Deutsch": 4}),]
 
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 
 @app.route('/')
@@ -26,7 +26,6 @@ def pure_function(student_id):
 
 @app.route('/a1f/<int:student_id>')
 def immutable_value(student_id):
-    # TODO 1: return a tuple with the excused and unexcused absences of a student as a string
     """Das ist eine Funktion die einen unveränderlichen Wert zurückgibt. Der Wert ist ein Tupel mit Absenzen eines
     Schülers."""
     absence_tuple = (students[student_id-1].excused_absences, students[student_id-1].unexcused_absences)
@@ -78,9 +77,46 @@ def filter_students(filter_func, filter_value):
     :param filter_value: Der Wert nach dem gefiltert werden soll
     :return: Die gefilterte Liste
     """
-    filtered = filter_func(students, filter_value)
-    print(filtered)
-    return f"Die gefilterte Liste ist: {str(filtered)}"
+    if filter_func == "filter_by_grades":
+        filter_func = filter_by_grades(students, filter_value)
+        print(filter_func)
+        return str(filter_func)
+    elif filter_func == "filter_by_class":
+        filter_func = filter_by_class(students, filter_value)
+        return str(filter_func)
+    else:
+        return "Falsche Funktion"
+
+
+# Funktion zur Anzeige von Schülern
+def display_students(action_function):
+    result = []
+    for student in students:
+        result.append(action_function(student))
+    return result
+
+
+# Eine Aktion, um den Namen eines Schülers anzuzeigen
+def display_name(student):
+    return f"Name: {student.name}"
+
+
+# Eine Aktion, um das Alter eines Schülers anzuzeigen
+def display_age(student):
+    return f"Alter: {student.age}"
+
+# Route zur Anzeige von Schülern nach Namen
+@app.route('/b2gf/display_names')
+def display_names():
+    student_names = display_students(display_name)
+    return student_names
+
+# Route zur Anzeige von Schülern nach Alter
+@app.route('/b2gf/display_ages')
+def display_ages():
+    student_ages = display_students(display_age)
+    return student_ages
+
 
 
 if __name__ == '__main__':
