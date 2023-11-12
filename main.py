@@ -180,7 +180,7 @@ def sorted_students():
 
 
 # Funktion zur Berechnung des Durchschnitts
-calculate_average = lambda student: sum(student.grades.values()) / len(student.grades)
+calculate_average = lambda student: sum(student.grades.values()) / len(student.grades.values())
 
 
 @app.route('/b4g')
@@ -196,6 +196,42 @@ def map_filter_reduce():
     return f"Die Durchschnittsnoten sind: {average_grades_list} <br> Die gefilterten Schüler sind: {filtered_students_list} <br> Der Klassendurchschnitt ist: {total_average_value}"
 
 
+@app.route('/b4fe')
+def map_filter_reduce_combined():
+    # Kombination von map, filter und reduce
+    adjusted_grades = list(map(lambda student: Student(student.student_id, student.name, student.age, student.student_class,
+                        {subject: grade - 0.25 for subject, grade in student.grades.items()}), students))
+
+    filtered_students = list(filter(lambda student: calculate_average(student) > 4, adjusted_grades))
+
+    average_excuse_count = reduce(lambda acc, student: acc + len(student.excused_absences), filtered_students, 0) / len(
+        filtered_students)
+    return f"Die angepassten Noten sind: {adjusted_grades} <br> Die gefilterten Schüler sind: {filtered_students} <br> Die durchschnittliche Anzahl Entschuldigungen ist: {average_excuse_count}"
+
+
+# Vor dem Refactoring
+@app.route('/c1gfe/before')
+def get_average_before():
+    total_grades = 0
+    total_students = 0
+
+    for student in students:
+        total_grades += sum(student.grades.values()) / len(student.grades.values())
+        total_students += 1
+
+    average = total_grades / total_students
+    return f"Der Durchschnitt der Schüler (vor dem Refactoring) ist {average}"
+
+# Nach dem Refactoring
+def calculate_student_total_grades(student):
+    return sum(student.grades.values()) / len(student.grades.values())
+
+@app.route('/c1gfe/after')
+def get_average_after():
+    total_grades = sum(map(calculate_student_total_grades, students))
+    total_students = len(students)
+    average = total_grades / total_students
+    return f"Der Durchschnitt der Schüler (nach dem Refactoring) ist {average}"
 
 
 if __name__ == '__main__':
